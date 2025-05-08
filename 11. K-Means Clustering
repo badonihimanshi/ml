@@ -1,0 +1,97 @@
+SKLEARN
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+
+# Load the Iris dataset
+iris = load_iris()
+X = iris.data
+
+# Apply KMeans clustering
+kmeans = KMeans(n_clusters=3, random_state=42)
+kmeans.fit(X)
+labels = kmeans.labels_
+centroids = kmeans.cluster_centers_
+
+# Reduce dimensions for visualization using PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X)
+centroids_pca = pca.transform(centroids)
+
+# Plotting clusters
+plt.figure(figsize=(8, 6))
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=labels, cmap='viridis', s=50, label='Data Points')
+plt.scatter(centroids_pca[:, 0], centroids_pca[:, 1], c='red', s=200, marker='X', label='Centroids')
+plt.title('K-Means Clustering on Iris Dataset (PCA-Reduced)')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+MANUAL
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Sample data (2D for easy visualization)
+X = np.array([
+    [1, 2], [1.5, 1.8], [5, 8],
+    [8, 8], [1, 0.6], [9, 11]
+])
+
+# Number of clusters
+k = 2
+
+# Randomly choose k data points as initial centroids
+np.random.seed(42)
+initial_indices = np.random.choice(len(X), k, replace=False)
+centroids = X[initial_indices]
+
+# Function to calculate Euclidean distance
+def distance(a, b):
+    return np.sqrt(np.sum((a - b) ** 2))
+
+# K-means algorithm
+max_iters = 100
+for _ in range(max_iters):
+    # Step 1: Assign clusters
+    clusters = [[] for _ in range(k)]
+    for point in X:
+        dists = [distance(point, centroid) for centroid in centroids]
+        cluster_idx = np.argmin(dists)
+        clusters[cluster_idx].append(point)
+
+    # Step 2: Update centroids
+    new_centroids = []
+    for cluster in clusters:
+        if cluster:
+            new_centroids.append(np.mean(cluster, axis=0))
+        else:
+            new_centroids.append(np.random.rand(2))  # handle empty cluster
+    new_centroids = np.array(new_centroids)
+
+    # Stop if centroids don't change
+    if np.allclose(centroids, new_centroids):
+        break
+    centroids = new_centroids
+
+# Final cluster assignments
+final_labels = []
+for point in X:
+    dists = [distance(point, centroid) for centroid in centroids]
+    final_labels.append(np.argmin(dists))
+
+# Plot result
+X = np.array(X)
+final_labels = np.array(final_labels)
+colors = ['r', 'g']
+for i in range(k):
+    plt.scatter(X[final_labels == i, 0], X[final_labels == i, 1], c=colors[i], label=f'Cluster {i}')
+plt.scatter(centroids[:, 0], centroids[:, 1], c='blue', marker='x', s=100, label='Centroids')
+plt.title("Manual K-Means Clustering")
+plt.legend()
+plt.show()
