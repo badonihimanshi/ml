@@ -1,0 +1,52 @@
+SKLEARN
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load Iris dataset
+iris = datasets.load_iris()
+X = iris.data
+y = iris.target
+
+# Split into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.3,
+    random_state=42,
+    stratify=y
+)
+
+# Define pipeline with scaling and SVM
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('svm', SVC(kernel='rbf', C=1.0, gamma='scale', random_state=42))
+])
+
+# Train the model
+pipeline.fit(X_train, y_train)
+
+# Make predictions
+y_pred = pipeline.predict(X_test)
+
+# Evaluation
+print(f"Test Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+# Confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+
+# Plot confusion matrix
+plt.figure(figsize=(6, 4))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+            xticklabels=iris.target_names,
+            yticklabels=iris.target_names)
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('SVM Confusion Matrix on Iris Dataset')
+plt.tight_layout()
+plt.show()
