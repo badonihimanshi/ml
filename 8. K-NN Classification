@@ -1,0 +1,84 @@
+sklearn
+
+import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# Load dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Split into train/test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Model Building
+k = 3
+knn = KNeighborsClassifier(n_neighbors=k)
+knn.fit(X_train, y_train)
+
+# Predict on test data
+y_pred = knn.predict(X_test)
+
+# Evaluate
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy*100:.2f}%\n")
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+
+MANUAL
+
+# Importing required libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+# Dataset preparation
+iris_df = datasets.load_iris()
+x = iris_df.data
+y = iris_df.target
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+# Finding feature mean and Std
+feature_means = np.mean(x_train, axis=0)
+feature_stds = np.std(x_train, axis=0)
+
+# Z-score normalisation
+X_train_normalized = (x_train - feature_means) / feature_stds
+X_test_normalized = (x_test - feature_means) / feature_stds
+
+# Imlement knn for 3 features
+def knn_predict(X_train, Y_train, X_test, k=3):
+    predictions = []
+
+    for test_sample in x_test:
+      # Euclidean dstace
+      distances = np.sqrt(np.sum((x_train - test_sample)**2, axis=1))
+
+      # Get indices of K nearest neighbours
+      nearest_indices = np.argsort(distances)[:k]
+
+      # Get lbels of nearest neigbhours
+      nearest_labels = y_train[nearest_indices]
+
+      # Predict  most common label
+      unique, counts = np.unique(nearest_labels, return_counts=True)
+      predicted_label = unique[np.argmax(counts)]
+
+      predictions.append(predicted_label)
+
+    return np.array(predictions)
+
+knn_predict(x_train, y_train, x_test)
+
+
