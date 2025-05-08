@@ -1,0 +1,45 @@
+# importing required modules
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
+
+#loading dataset
+house_df = pd.read_csv("/content/drive/MyDrive/House_Price - Sheet1.csv")
+print(house_df.head())
+
+print("Columns in Datast: ", house_df.columns)
+
+# Area vs Price Plot
+
+plt.figure(figsize = (12, 6))
+plt.scatter(house_df['Area '], house_df['Prices '])
+plt.xlabel('Area')
+plt.ylabel('Price')
+plt.title('Area vs Price')
+plt.show()
+
+# Df splitting
+
+X = house_df['Area '].values.reshape(-1, 1)
+y = house_df['Prices '].values.reshape(-1, 1)
+
+# Train Test Split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
+
+uni_lin_reg = LinearRegression()
+uni_lin_reg.fit(X_train, y_train)
+
+# Model Parameters
+print(f"""
+Regression Intercept (bias): {uni_lin_reg.intercept_}
+Regression Coefficient (weight): {uni_lin_reg.coef_}""")
+
+# Testing
+
+price = 100*uni_lin_reg.coef_ + uni_lin_reg.intercept_
+print("Predicted price: ", price)
