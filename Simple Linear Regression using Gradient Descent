@@ -1,0 +1,43 @@
+# Data
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([2, 2.5, 3.5, 4.0, 4.5])
+
+# Hyperparameters
+w0 = 0.5
+w1 = 0.5
+learning_rate = 0.007
+epochs = 100
+
+m = len(x)
+loss_history = []
+
+# Gradient Descent
+for epoch in range(epochs):
+    # Predicted values using polynomial model
+    y_pred = w0 + w1*x
+
+    # Compute the gradients
+    dw0 = -(1/m) * np.sum(y - y_pred)
+    dw1 = -(1/m) * np.sum((y - y_pred) * x)
+
+    # Update weights
+    w0 -= learning_rate * dw0
+    w1 -= learning_rate * dw1
+    loss = np.mean((y - y_pred) ** 2)  # Mean Squared Error
+    loss_history.append(loss)
+
+    if epoch % 10 == 0:
+        print(f'Epoch {epoch}: Loss = {loss:.3f}, w0 = {w0:.3f}, w1 = {w1:.3f}')
+
+# Final weights after training
+print(f'Final weights: w0 = {w0:.3f}, w1 = {w1:.3f}')
+
+# Plot
+plt.figure(figsize=(10, 6))
+plt.plot(loss_history, label='Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Loss vs Epoch')
+plt.legend()
+plt.grid()
+plt.show()
