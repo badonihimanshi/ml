@@ -1,0 +1,115 @@
+sklearn 
+
+import numpy as np
+import pandas as pd
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load dataset
+diabetes = datasets.load_diabetes()
+X = diabetes.data
+y = diabetes.target
+
+
+threshold = y.mean()
+y_binary = (y > threshold).astype(int)
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y_binary, test_size=0.2, random_state=42)
+
+# Train logistic regression model
+model = LogisticRegression(max_iter=1000)  # Increase max_iter if needed
+model.fit(X_train, y_train)
+
+# Predict
+y_pred = model.predict(X_test)
+
+# Evaluation
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy*100:.2f}%")
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=["Below Mean", "Above Mean"], yticklabels=["Below Mean", "Above Mean"])
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix")
+plt.show()
+
+Manual using Gradient Descent
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+
+diabetes = datasets.load_diabetes()
+X = diabetes.data
+y = diabetes.target
+threshold = y.mean()
+y=(y>threshold).astype(int) #converting y into binary output taking mean as thrshold.
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+
+m, n = X_train.shape
+w = np.random.randn(n)*0.2 # or w=np.zero() + 0.2
+b=0
+alpha=0.9
+epochs=10001
+
+def sigmoid(z):
+  return 1/(1+np.exp(-z))
+
+def binary_cross_entropy(y_true, y_pred):
+  ep = 1e-7 # to avoid log(0) error
+  return -np.mean(y_true*np.log(y_pred+ep) + (1-y_true)*np.log(1-y_pred+ep))
+
+losses = []
+
+for epoch in range(epochs):
+  z = X_train@w + b
+  predictions = sigmoid(z)
+  error = predictions - y_train
+
+  # GRADIENT
+  dw = (1/m) * X_train.T@error
+  db = (1/m) * np.sum(error)
+
+  # update parameters
+
+  w -= alpha * dw
+  b -= alpha * db
+
+  # calculate loss
+  loss = binary_cross_entropy(y_train, predictions)
+  losses.append(loss)
+
+  # print loss every 100 epochs
+  if epoch % 1000 == 0:
+    print(f"Epoch {epoch}: Loss = {loss:.4f}")
+
+# predict the test set
+z_test = np.dot(X_test, w) + b
+y_pred_test = sigmoid(z_test)
+y_pred_class=(y_pred_test>0.5).astype(int)
+
+# Accuracy
+accuracy = np.mean(y_pred_class == y_test)
+print(f"Accuracy: {accuracy*100:.4f}")
+
+# Plot loss curve
+plt.plot(losses)
+plt.xlabel('Epochs')
+plt.ylabel('Binary Cross-Entropy Loss')
+plt.title('Training Loss Curve')
+plt.show()
