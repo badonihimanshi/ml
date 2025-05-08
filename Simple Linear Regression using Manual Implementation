@@ -1,0 +1,46 @@
+# importing required modules
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+
+#loading dataset
+house_df = pd.read_csv("/content/drive/MyDrive/House_Price - Sheet1.csv")
+print(house_df.head())
+
+print("Columns in Datast: ", house_df.columns)
+
+# Area vs Price Plot
+
+plt.figure(figsize = (12, 6))
+plt.scatter(house_df['Area '], house_df['Prices '])
+plt.xlabel('Area')
+plt.ylabel('Price')
+plt.title('Area vs Price')
+plt.show()
+
+# Df splitting
+
+X = house_df['Area ']
+y = house_df['Prices ']
+
+# Model Building
+
+n = len(X)
+x_mean = np.mean(X)
+y_mean = np.mean(y)
+
+# Determining parameters
+m = np.sum((X - x_mean) * (y - y_mean)) / np.sum((X - x_mean)**2) #least square method
+c = y_mean - m * x_mean
+
+# Model Parameters
+print(f"""
+Regression Intercept (bias): {c}
+Regression Coefficient (weight): {m}""")
+
+# Testing
+
+price = 100*m + c
+print("Predicted price: ", price)
